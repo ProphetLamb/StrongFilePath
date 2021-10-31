@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using StrongFilePath;
 
 namespace StrongFileStructure.Tests
 {
@@ -8,7 +9,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFileExtensions()
         {
-            FilePath fp = @"C:\Directory//To\File.ext";
+            FilePath fp = @"C:\Directory//To\File.ext".ToFilePath();
             FilePath re = fp.GetFileInfo().GetFilePath();
             using PathSegmentEnumerator fpEn = fp.GetEnumerator();
             using PathSegmentEnumerator reEn = re.GetEnumerator();

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using StrongFilePath;
 
 namespace StrongFileStructure.Tests
 {
@@ -30,7 +31,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFilePathFromAbsoluteFilePath()
         {
-            FilePath fp = @"C:\Directory//To\File.ext";
+            FilePath fp = @"C:\Directory//To\File.ext".ToFilePath();
             Assert.AreEqual(@"C:\Directory//To\", fp.DirectoryPath.ToString());
             Assert.AreEqual(@"File.ext", fp.FileName.ToString());
             Assert.AreEqual(@"File", fp.FileNameWithoutExtension.ToString());
@@ -45,7 +46,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFilePathFromRelativeThisFilePath()
         {
-            FilePath fp = @".\Directory//To\File.ext";
+            FilePath fp = @".\Directory//To\File.ext".ToFilePath();
             Assert.AreEqual(@".\Directory//To\", fp.DirectoryPath.ToString());
             Assert.AreEqual(@"File.ext", fp.FileName.ToString());
             Assert.AreEqual(@"File", fp.FileNameWithoutExtension.ToString());
@@ -60,7 +61,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFilePathFromRelativeParentFilePath()
         {
-            FilePath fp = @"..\../Directory//To\File.ext";
+            FilePath fp = @"..\../Directory//To\File.ext".ToFilePath();
             Assert.AreEqual(@"..\../Directory//To\", fp.DirectoryPath.ToString());
             Assert.AreEqual(@"File.ext", fp.FileName.ToString());
             Assert.AreEqual(@"File", fp.FileNameWithoutExtension.ToString());
@@ -75,7 +76,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFilePathFromRelativeNoDotFilePath()
         {
-            FilePath fp = @"\Directory//To\File.ext";
+            FilePath fp = @"\Directory//To\File.ext".ToFilePath();
             Assert.AreEqual(@"\Directory//To\", fp.DirectoryPath.ToString());
             Assert.AreEqual(@"File.ext", fp.FileName.ToString());
             Assert.AreEqual(@"File", fp.FileNameWithoutExtension.ToString());
@@ -90,7 +91,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFilePathFromRelativePrefixFilePath()
         {
-            FilePath fp = @"Directory//To\File.ext";
+            FilePath fp = @"Directory//To\File.ext".ToFilePath();
             Assert.AreEqual(@"Directory//To\", fp.DirectoryPath.ToString());
             Assert.AreEqual(@"File.ext", fp.FileName.ToString());
             Assert.AreEqual(@"File", fp.FileNameWithoutExtension.ToString());
@@ -106,7 +107,7 @@ namespace StrongFileStructure.Tests
         public void TestNoExtension()
         {
             string path = @"Directory//To\File";
-            FilePath fp = path;
+            FilePath fp = path.ToFilePath();
             Assert.AreEqual(path, fp.FullFilePath);
             Assert.AreEqual(@"Directory//To\", fp.DirectoryPath.ToString());
             Assert.AreEqual(@"File", fp.FileName.ToString());
@@ -122,7 +123,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFileName()
         {
-            FilePath fp = @"Directory//To\";
+            FilePath fp = @"Directory//To\".ToFilePath();
             Assert.AreEqual(@"Directory//To\", fp.DirectoryPath.ToString());
             Assert.AreEqual(@"", fp.FileName.ToString());
             Assert.AreEqual(@"", fp.FileNameWithoutExtension.ToString());
@@ -137,7 +138,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestOnlyFileExtensions()
         {
-            FilePath fp = @".gitignore";
+            FilePath fp = @".gitignore".ToFilePath();
             Assert.AreEqual(@"", fp.DirectoryPath.ToString());
             Assert.AreEqual(@".gitignore", fp.FileName.ToString());
             Assert.AreEqual(@"", fp.FileNameWithoutExtension.ToString());
@@ -152,7 +153,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestValidateFilePath()
         {
-            FilePath illegal = @"C||:/<Directory>\FIle";
+            FilePath illegal = @"C||:/<Directory>\FIle".ToFilePath();
             Assert.IsFalse(illegal.IsValid());
             foreach (FilePath file in Environment.CurrentDirectory.ToFilePath().GetDirectoryInfo().EnumerateFiles().Select(fi => fi.GetFilePath()))
             {
@@ -164,7 +165,7 @@ namespace StrongFileStructure.Tests
         public void TestValidateFileName()
         {
             Assert.IsFalse("".ToFilePath().IsValidFileName());
-            FilePath illegal = @"<|sd-v.,efe34+<>""|"":";
+            FilePath illegal = @"<|sd-v.,efe34+<>""|"":".ToFilePath();
             Assert.IsFalse(illegal.IsValidFileName());
             foreach (FilePath file in Environment.CurrentDirectory.ToFilePath().GetDirectoryInfo().EnumerateFiles().Select(fi => fi.GetFilePath()))
             {
@@ -176,7 +177,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFileOpenShared()
         {
-            FilePath fp = Path.GetTempFileName();
+            FilePath fp = Path.GetTempFileName().ToFilePath();
             Assert.IsTrue(fp.Exists());
             using (FileStream write = fp.OpenWrite())
             {
@@ -199,7 +200,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFileOpenLocked()
         {
-            FilePath fp = Path.GetTempFileName();
+            FilePath fp = Path.GetTempFileName().ToFilePath();
             using (FileStream write = fp.Create(shared: false))
             {
                 Assert.Catch(() => fp.OpenRead().Dispose());
@@ -225,11 +226,11 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestExtensionEquals()
         {
-            FilePath fp = @"\path\to\file.txt";
+            FilePath fp = @"\path\to\file.txt".ToFilePath();
             Assert.IsTrue(fp.ExtensionEquals(".txt"));
             Assert.IsTrue(fp.ExtensionEquals("txt"));
             
-            FilePath fp2 = @".gitignore";
+            FilePath fp2 = @".gitignore".ToFilePath();
             Assert.IsTrue(fp2.ExtensionEquals(".gitignore"));
             Assert.IsTrue(fp2.ExtensionEquals("gitignore"));
         }
@@ -237,7 +238,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestFilePathCombine()
         {
-            FilePath fp = @"C:\path\to\file.txt";
+            FilePath fp = @"C:\path\to\file.txt".ToFilePath();
             Assert.AreEqual(fp.ToString(), @"C:\path\to".ToFilePath().CombineWith("file.txt").ToString());
             Assert.AreEqual(fp.ToString(), @"C:\path".ToFilePath().CombineWith("to", "file.txt").ToString());
             Assert.AreEqual(fp.ToString(), "C:".ToFilePath().CombineWith("path", "to", "file.txt").ToString());

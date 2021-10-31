@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
+using StrongFilePath;
 
 namespace StrongFileStructure.Tests
 {
@@ -19,7 +20,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestEnumerateSinglePortion()
         {
-            FilePath fp = @"File.ext";
+            FilePath fp = @"File.ext".ToFilePath();
             using PathSegmentEnumerator en = fp.GetEnumerator();
             Assert.IsTrue(en.MoveNext());
             Assert.AreEqual(en.Current.ToString(), @"File.ext");
@@ -29,7 +30,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestEnumerateFullFilePath()
         {
-            FilePath fp = @"C:\Directory//To\File.ext";
+            FilePath fp = @"C:\Directory//To\File.ext".ToFilePath();
             using PathSegmentEnumerator en = fp.GetEnumerator();
             Assert.IsTrue(en.MoveNext());
             Assert.AreEqual(en.Current.ToString(), @"C:\");
@@ -51,7 +52,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestEnumerateReverseFullFilePath()
         {
-            FilePath fp = @"C:\Directory//To\File.ext";
+            FilePath fp = @"C:\Directory//To\File.ext".ToFilePath();
             using PathSegmentEnumerator en = fp.GetEnumerator();
 
             en.ResetToEnd();
@@ -83,7 +84,7 @@ namespace StrongFileStructure.Tests
         [Test]
         public void TestBoxedEnumerate()
         {
-            FilePath fp = @"C:\Directory//To\File.ext";
+            FilePath fp = @"C:\Directory//To\File.ext".ToFilePath();
             using (IEnumerator<string> en = fp.GetEnumerator())
             {
                 Assert.IsTrue(en.MoveNext());
