@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -250,7 +251,7 @@ namespace StrongFilePath
         /// <exception cref="ArgumentException"><see cref="IsEmpty"/> or !<see cref="IsValid()"/></exception>
         public FilePath Normalize()
         {
-            return Path.GetFullPath(FullFilePath);
+            return Path.GetFullPath(FullFilePath).ToFilePath();
         }
 
         /// <summary>
@@ -259,6 +260,7 @@ namespace StrongFilePath
         /// <remarks>
         ///     False negative matches are not possible.
         ///     False positive matches are possible.
+        /// 
         /// </remarks>
         public bool IsValid()
         {
@@ -435,7 +437,7 @@ namespace StrongFilePath
                 throw new ArgumentOutOfRangeException(nameof(additionalCapacity));
             }
             Builder builder = new(FullFilePath.Length + Math.Max(16, additionalCapacity));
-            builder.Append(FullFilePath);
+            builder.Append(FullFilePath.AsSpan());
             return builder;
         }
 
@@ -445,7 +447,7 @@ namespace StrongFilePath
         /// <returns>The resulting <see cref="FilePath"/>.</returns>
         public FilePath CombineWith(ReadOnlySpan<char> pathSegment)
         {
-            return Combine(FullFilePath, pathSegment);
+            return Combine(FullFilePath.AsSpan(), pathSegment);
         }
 
         /// <summary>
@@ -454,7 +456,7 @@ namespace StrongFilePath
         /// <returns>The resulting <see cref="FilePath"/>.</returns>
         public FilePath CombineWith(ReadOnlySpan<char> pathSegment1, ReadOnlySpan<char> pathSegment2)
         {
-            return Combine(FullFilePath, pathSegment1, pathSegment2);
+            return Combine(FullFilePath.AsSpan(), pathSegment1, pathSegment2);
         }
 
         /// <summary>
@@ -463,7 +465,7 @@ namespace StrongFilePath
         /// <returns>The resulting <see cref="FilePath"/>.</returns>
         public FilePath CombineWith(ReadOnlySpan<char> pathSegment1, ReadOnlySpan<char> pathSegment2, ReadOnlySpan<char> pathSegment3)
         {
-            return Combine(FullFilePath, pathSegment1, pathSegment2, pathSegment3);
+            return Combine(FullFilePath.AsSpan(), pathSegment1, pathSegment2, pathSegment3);
         }
 
         /// <summary>
@@ -543,7 +545,7 @@ namespace StrongFilePath
             }
             foreach (ReadOnlySpan<char> pathEntry in environmentVariableContent.AsSpan().Split(';', SplitOptions.RemoveEmptyEntries))
             {
-                FilePath filePath = FilePath.Combine(pathEntry[..^1], fileName);
+                FilePath filePath = FilePath.Combine(pathEntry.Slice(0, pathEntry.Length - 1), fileName);
                 if (filePath.Exists())
                 {
                     return filePath;
@@ -588,6 +590,19 @@ namespace StrongFilePath
             return new FilePathInfo(lastDirectorySeparator, fileExtensionSeparator, flags);
         }
 
+        public static explicit operator FilePath(string self) => new(self);
+
+        public static explicit operator FilePath(ReadOnlySpan<char> self) => new(self.ToString());
+            
+        public static implicit operator string(in FilePath self) => self.FullFilePath;
+
+        public static implicit operator ReadOnlySpan<char>(in FilePath self) => self.FullFilePath.AsSpan();
+
+        /// <summary>
+        ///     The <see cref="FilePath"/> of <see cref="String.Empty"/>.
+        /// </summary>
+        public static FilePath Empty => new(String.Empty);
+
         private readonly struct FilePathInfo
         {
             public readonly int LastDirectorySeparator;
@@ -603,16 +618,5 @@ namespace StrongFilePath
                 Flags = flags;
             }
         }
-
-        public static implicit operator FilePath(string self) => new(self);
-
-        public static explicit operator string(in FilePath self) => self.FullFilePath;
-
-        public static explicit operator ReadOnlySpan<char>(in FilePath self) => self.FullFilePath.AsSpan();
-
-        /// <summary>
-        ///     The <see cref="FilePath"/> of <see cref="String.Empty"/>.
-        /// </summary>
-        public static FilePath Empty => new(String.Empty);
     }
 }

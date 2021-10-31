@@ -7,17 +7,11 @@ namespace StrongFilePath
 {
     internal static class CollectionExtensions
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNullOrEmpty<T>([NotNullWhen(false)] this IReadOnlyCollection<T>? self)
-        {
-            return self is null || self.Count == 0;
-        }
-
         public static T? Get<T>(this IReadOnlyList<T>? self, int index)
         {
             if (self is null || (uint)index >= (uint)self.Count)
             {
-                return default(T);
+                return default;
             }
 
             return self[index];
