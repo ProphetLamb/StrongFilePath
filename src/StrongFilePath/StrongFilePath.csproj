@@ -1,13 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>9</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <!--<SymbolPackageFormat>snupkg</SymbolPackageFormat>-->
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <Title>StrongFilePath</Title>
+    <Authors>ProphetLamb</Authors>
+    <Owners>ProphetLamb</Owners>
+    <Description> Strong typed file path structure </Description>
+    <Copyright>Copyright (c) 2021 Prophet Lamb</Copyright>
+    <PackageProjectUrl>https://github.com/ProphetLamb/StrongFilePath</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ProphetLamb/StrongFilePath.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageTags>C# Path</PackageTags>
+    <Version>0.1.1</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="HeaplessUtility" Version="0.2.3" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="..\..\README.md" Pack="true" PackagePath="README.md"/>
   </ItemGroup>
 
 </Project>
